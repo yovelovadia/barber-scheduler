@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, NativeModules, Platform } from "react-native";
 import React, { useState } from "react";
+import Modal from "react-native-modal";
 
 const months_names = [
   "ינואר",
@@ -22,8 +23,6 @@ const deviceLanguage =
     ? NativeModules.SettingsManager.settings.AppleLocale ||
       NativeModules.SettingsManager.settings.AppleLanguages[0] //iOS 13
     : NativeModules.I18nManager.localeIdentifier;
-
-console.log(deviceLanguage == "en_US");
 
 function Day(props) {
   const [whatDayInWeek, setWhatDayInWeek] = useState(
@@ -55,6 +54,9 @@ function Day(props) {
                 {item.name},{item.phone},{item.tor},{item.colorNumber},
                 {item.oxPrecentage},{item.colorCompany}
               </Text>
+              <Modal>
+                <Text>I AM BLALALA</Text>
+              </Modal>
             </View>
           ))
         : null}
@@ -79,7 +81,10 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 20,
   },
-  customersText: { textAlign: deviceLanguage == "iw_IL" ? "left" : "left" },
+  customersText: {
+    textAlign: deviceLanguage == "iw_IL" ? "left" : "left",
+    fontSize: 30,
+  },
 });
 
 export default Day;

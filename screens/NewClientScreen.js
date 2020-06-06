@@ -6,7 +6,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableHighlight,
-  FlatList
+  FlatList,
 } from "react-native";
 import ClassicTextInput from "./Components/ClassicTextInput";
 import DayHourPick from "./Components/DayHourPick";

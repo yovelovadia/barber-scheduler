@@ -1,15 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { SearchBar } from "react-native-elements";
 import AsyncStoarge from "@react-native-community/async-storage";
 import Day from "./Components/Day";
 import { FlatList } from "react-native-gesture-handler";
 
+const dateToday = new Date().toJSON().split("T")[0];
+let dateWeek = [];
+
+for (let i = 0; i < 7; i++) {
+  const date = new Date();
+  const day = new Date(date.setDate(date.getDate() + i));
+  dateWeek.push(day.toJSON().split("T")[0]);
+}
+
 function ShowDatesScreen() {
   const [refresh, setRefresh] = useState(0);
   const [search, setSearch] = useState(null);
   const [dataInDb, setDataInDB] = useState(null);
-  const [days, setDays] = useState(null);
+  const [daysAndAllDays, setDaysAndAllDays] = useState(null);
   const [filteredData, setFilteredData] = useState(null);
 
   useEffect(() => {
@@ -49,7 +58,10 @@ function ShowDatesScreen() {
         .then((res) => {
           setDataInDB(res);
           setFilteredData(res);
-          setDays(Object.keys(res).sort().reverse());
+          setDaysAndAllDays({
+            days: Object.keys(res).sort().reverse(),
+            allDays: Object.keys(res).sort().reverse(),
+          });
         })
         .catch((err) => console.log(err));
     }
@@ -62,7 +74,7 @@ function ShowDatesScreen() {
   function searchInDB(search) {
     let completed_filtered_list = {};
     setSearch(search);
-    const filterToSearch = days.map((data) =>
+    const filterToSearch = daysAndAllDays.days.map((data) =>
       dataInDb[data].filter((res) => {
         return Object.keys(res).find((item) => {
           return res[item].indexOf(search) !== -1;
@@ -84,6 +96,38 @@ function ShowDatesScreen() {
         onChangeText={searchInDB}
         value={search}
       />
+      <View style={styles.time_to_show}>
+        <TouchableOpacity
+          onPress={() =>
+            setDaysAndAllDays({
+              allDays: [...daysAndAllDays.allDays],
+              days: [...daysAndAllDays.allDays],
+            })
+          }
+        >
+          <Text style={styles.time_to_show_text}>הכל</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            setDaysAndAllDays({
+              allDays: [...daysAndAllDays.allDays],
+              days: dateWeek.reverse(),
+            })
+          }
+        >
+          <Text style={styles.time_to_show_text}>השבוע</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() =>
+            setDaysAndAllDays({
+              allDays: [...daysAndAllDays.allDays],
+              days: [dateToday],
+            })
+          }
+        >
+          <Text style={styles.time_to_show_text}>היום</Text>
+        </TouchableOpacity>
+      </View>
       <Text
         onPress={() => {
           setRefresh(refresh + 1);
@@ -92,10 +136,10 @@ function ShowDatesScreen() {
       >
         refresh
       </Text>
-      {days ? (
+      {daysAndAllDays ? (
         <FlatList
           style={styles.scroller}
-          data={days}
+          data={daysAndAllDays.days}
           keyExtractor={(event) => event}
           renderItem={(event) => (
             <Day dates={filteredData[event.item]} name={event.item} />
@@ -111,6 +155,15 @@ function ShowDatesScreen() {
 const styles = StyleSheet.create({
   scroller: {
     marginBottom: 90,
+  },
+  time_to_show: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  time_to_show_text: {
+    borderWidth: 1,
+    fontSize: 30,
+    borderColor: "grey",
   },
 });
 
