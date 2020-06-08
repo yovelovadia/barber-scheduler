@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "client",
-    "slug": "client",
+    "name": "react-native-new-project",
+    "slug": "react-native-new-project",
     "platforms": [
       "ios",
       "android",
