@@ -15,7 +15,10 @@
     "@react-navigation/native": "^5.5.0",
     "expo": "^37.0.12",
     "expo-constants": "~9.0.0",
+<<<<<<< HEAD
     "expo-linear-gradient": "^8.1.0",
+=======
+>>>>>>> e184c627ac4ba28fb36bf41c73358ccd905266b3
     "react": "~16.9.0",
     "react-dom": "~16.9.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-37.0.1.tar.gz",
