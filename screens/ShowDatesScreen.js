@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  RefreshControl,
+  CheckBox,
+} from "react-native";
 import { SearchBar } from "react-native-elements";
 import AsyncStoarge from "@react-native-community/async-storage";
 import Day from "./Components/Day";
@@ -15,10 +22,10 @@ for (let i = 0; i < 7; i++) {
 }
 
 function ShowDatesScreen() {
-  const [refresh, setRefresh] = useState(0);
+  const [refreshing, setRefreshing] = React.useState(false);
   const [search, setSearch] = useState(null);
   const [dataInDb, setDataInDB] = useState(null);
-  const [daysAndAllDays, setDaysAndAllDays] = useState(null);
+  const [daysAndAllDays, setDaysAndAllDays] = useState({ timePicked: "all" });
   const [filteredData, setFilteredData] = useState(null);
 
   useEffect(() => {
@@ -59,17 +66,19 @@ function ShowDatesScreen() {
           setDataInDB(res);
           setFilteredData(res);
           setDaysAndAllDays({
-            days: Object.keys(res).sort().reverse(),
+            days: daysAndAllDays.days || Object.keys(res).sort().reverse(),
             allDays: Object.keys(res).sort().reverse(),
+            timePicked: daysAndAllDays.timePicked,
           });
         })
+        .then(() => setRefreshing(false))
+
         .catch((err) => console.log(err));
     }
-
     return () => {
       unmounted = true;
     };
-  }, [refresh]);
+  }, [refreshing]);
 
   function searchInDB(search) {
     let completed_filtered_list = {};
@@ -90,7 +99,7 @@ function ShowDatesScreen() {
   }
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <SearchBar
         placeholder={"חיפוש"}
         onChangeText={searchInDB}
@@ -98,51 +107,79 @@ function ShowDatesScreen() {
       />
       <View style={styles.time_to_show}>
         <TouchableOpacity
+          style={{
+            flex: 1,
+            backgroundColor:
+              daysAndAllDays.timePicked === "all" ? "#1c1c1c" : "#4a4a4a",
+          }}
           onPress={() =>
             setDaysAndAllDays({
               allDays: [...daysAndAllDays.allDays],
               days: [...daysAndAllDays.allDays],
+              timePicked: "all",
             })
           }
         >
           <Text style={styles.time_to_show_text}>הכל</Text>
         </TouchableOpacity>
         <TouchableOpacity
+          style={{
+            flex: 1,
+            backgroundColor:
+              daysAndAllDays.timePicked === "week" ? "#1c1c1c" : "#4a4a4a",
+          }}
           onPress={() =>
             setDaysAndAllDays({
               allDays: [...daysAndAllDays.allDays],
               days: dateWeek.reverse(),
+              timePicked: "week",
             })
           }
         >
           <Text style={styles.time_to_show_text}>השבוע</Text>
         </TouchableOpacity>
         <TouchableOpacity
+          style={{
+            flex: 1,
+            backgroundColor:
+              daysAndAllDays.timePicked === "day" ? "#1c1c1c" : "#4a4a4a",
+          }}
           onPress={() =>
             setDaysAndAllDays({
               allDays: [...daysAndAllDays.allDays],
               days: [dateToday],
+              timePicked: "day",
             })
           }
         >
           <Text style={styles.time_to_show_text}>היום</Text>
         </TouchableOpacity>
       </View>
-      <Text
-        onPress={() => {
-          setRefresh(refresh + 1);
-          setSearch(null);
-        }}
-      >
-        refresh
-      </Text>
+
+      {filteredData ? (
+        Object.keys(filteredData).length === 0 ? (
+          <Text style={styles.notFound}>לא נמצא תור בשם זה</Text>
+        ) : null
+      ) : null}
+
       {daysAndAllDays ? (
         <FlatList
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => setRefreshing(true)}
+            />
+          }
           style={styles.scroller}
           data={daysAndAllDays.days}
           keyExtractor={(event) => event}
           renderItem={(event) => (
-            <Day dates={filteredData[event.item]} name={event.item} />
+            <Day
+              dateToday={dateToday}
+              dates={filteredData[event.item]}
+              name={event.item}
+              onRefresh={() => setRefreshing(true)}
+            />
           )}
         />
       ) : (
@@ -151,20 +188,22 @@ function ShowDatesScreen() {
     </View>
   );
 }
-
 const styles = StyleSheet.create({
-  scroller: {
-    marginBottom: 90,
-  },
+  scroller: {},
   time_to_show: {
     flexDirection: "row",
     justifyContent: "space-around",
+    fontSize: 30,
   },
   time_to_show_text: {
-    borderWidth: 1,
+    borderWidth: 2,
     fontSize: 30,
-    borderColor: "grey",
+    padding: 10,
+    borderColor: "aliceblue",
+    color: "aliceblue",
+    textAlign: "center",
   },
+  notFound: { fontSize: 37, textAlign: "center", marginTop: 60 },
 });
 
 export default ShowDatesScreen;

@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, NativeModules, Platform } from "react-native";
 import React, { useState } from "react";
-import Modal from "react-native-modal";
+import SettingsOnDate from "./SettingsOnDate";
 
 const months_names = [
   "ינואר",
@@ -25,6 +25,7 @@ const deviceLanguage =
     : NativeModules.I18nManager.localeIdentifier;
 
 function Day(props) {
+  const [modalVisible, setModalVisible] = useState(false);
   const [whatDayInWeek, setWhatDayInWeek] = useState(
     new Date(props.name).getDay()
   );
@@ -33,6 +34,9 @@ function Day(props) {
     new Date(props.name).getDate()
   );
   const [whatYear, setWhatYear] = useState(new Date(props.name).getFullYear());
+  const [toggleShow, setToggleShow] = useState(
+    props.dateToday === props.name ? true : false
+  );
 
   return (
     <View>
@@ -40,23 +44,34 @@ function Day(props) {
         <View style={styles.header}>
           <Text style={styles.text}>{whatYear}</Text>
 
-          <Text style={{ ...styles.date, ...styles.text }}>
+          <Text
+            onPress={() => setToggleShow(!toggleShow)}
+            style={{ ...styles.date, ...styles.text }}
+          >
             יום {day_names[whatDayInWeek]} {whatDayInMonth} ב
             {months_names[whatMonth]}{" "}
           </Text>
         </View>
       ) : null}
 
-      {props.dates
+      {props.dates && toggleShow
         ? props.dates.map((item) => (
             <View style={styles.customersContainer} key={item.id}>
-              <Text style={styles.customersText}>
+              <Text
+                onPress={() => setModalVisible(!modalVisible)}
+                style={styles.customersText}
+              >
                 {item.name},{item.phone},{item.tor},{item.colorNumber},
                 {item.oxPrecentage},{item.colorCompany}
               </Text>
-              <Modal>
-                <Text>I AM BLALALA</Text>
-              </Modal>
+              {modalVisible ? (
+                <SettingsOnDate
+                  onRefresh={props.onRefresh}
+                  isVisible={modalVisible}
+                  onPress={() => setModalVisible(!modalVisible)}
+                  item={item}
+                ></SettingsOnDate>
+              ) : null}
             </View>
           ))
         : null}

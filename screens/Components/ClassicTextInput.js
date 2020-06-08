@@ -9,6 +9,7 @@ function ClassicTextInput(props, ref) {
       <Text style={styles.name}>{props.inputName}</Text>
       <TextInput
         ref={ref}
+        value={props.value}
         onSubmitEditing={props.onSubmit}
         keyboardType={props.keyboardType}
         style={styles.text_input}
@@ -30,12 +31,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "grey",
     width: 200,
-    fontSize: 20,
+    fontSize: 28,
     textAlign: "right",
     borderWidth: 0,
   },
   name: {
     color: "#53b5ed",
+    fontSize: 20,
   },
 });
 

@@ -2,11 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   ScrollView,
   TouchableHighlight,
-  FlatList,
+  Platform,
 } from "react-native";
 import ClassicTextInput from "./Components/ClassicTextInput";
 import DayHourPick from "./Components/DayHourPick";
@@ -67,6 +66,7 @@ function NewClientScreen() {
           <ClassicTextInput
             ref={phoneRef}
             inputName={"טלפון"}
+            keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
             onChangeText={(text) => setData({ ...data, phone: text })}
             onSubmit={() => {
               torRef.current.focus();
@@ -83,6 +83,7 @@ function NewClientScreen() {
           <ClassicTextInput
             ref={colorNumberRef}
             inputName={"מספר צבע"}
+            keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
             onChangeText={(text) => setData({ ...data, colorNumber: text })}
             onSubmit={() => {
               oxPrecentageRef.current.focus();
@@ -91,6 +92,7 @@ function NewClientScreen() {
           <ClassicTextInput
             ref={oxPrecentageRef}
             inputName={"אחוז חמצן"}
+            keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
             onChangeText={(text) => setData({ ...data, oxPrecentage: text })}
             onSubmit={() => {
               colorCompanyRef.current.focus();
@@ -113,7 +115,7 @@ function NewClientScreen() {
             underlayColor={"#0299f7"}
             style={styles.submit}
           >
-            <Text> תור חדש</Text>
+            <Text style={styles.submitText}> תור חדש</Text>
           </TouchableHighlight>
         </View>
       </ScrollView>
@@ -132,6 +134,10 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     backgroundColor: "#a6d8f5",
     padding: 18,
+  },
+
+  submitText: {
+    fontSize: 20,
   },
 });
 

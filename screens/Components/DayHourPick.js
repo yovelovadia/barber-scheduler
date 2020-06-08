@@ -3,14 +3,14 @@ import { View, Button, Platform, StyleSheet, Text } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 const DayHourPick = (props) => {
-  const [date, setDate] = useState(new Date());
+  const [date, setDate] = useState(props.alreadyPickedDate || new Date());
   const [mode, setMode] = useState("date");
   const [show, setShow] = useState(false);
   const [timePicked, setTimePicked] = useState(
-    JSON.stringify(new Date()).slice(12, 17)
+    props.timeValue || JSON.stringify(new Date()).slice(12, 17)
   );
   const [datePicked, setDatePicked] = useState(
-    JSON.stringify(new Date()).slice(1, 11)
+    props.dateValue || JSON.stringify(new Date()).slice(1, 11)
   );
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate || date;
@@ -40,17 +40,16 @@ const DayHourPick = (props) => {
   return (
     <View style={styles.container}>
       <View style={styles.buttonTextContainer}>
-        <Text>{datePicked}</Text>
-
         <Text style={styles.buttons} onPress={showDatepicker}>
           בחר תאריך
         </Text>
+        <Text style={styles.timeText}>{datePicked}</Text>
       </View>
       <View style={styles.buttonTextContainer}>
-        <Text>{timePicked}</Text>
         <Text style={styles.buttons} onPress={showTimepicker}>
           בחר שעה
         </Text>
+        <Text style={styles.timeText}>{timePicked}</Text>
       </View>
       {show && (
         <DateTimePicker
@@ -69,24 +68,28 @@ const DayHourPick = (props) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 35,
+    marginTop: 35,
     display: "flex",
-    alignItems: "flex-end",
   },
   buttonTextContainer: {
-    marginTop: 20,
+    marginTop: 25,
     display: "flex",
     flexDirection: "row",
+    alignItems: "center",
   },
 
   buttons: {
     backgroundColor: "#52aee3",
     color: "aliceblue",
-    fontSize: 15,
+    fontSize: 18,
     width: 110,
-    padding: 10,
+    padding: 5,
     textAlign: "center",
-    marginLeft: 25,
+    marginRight: 25,
+  },
+
+  timeText: {
+    fontSize: 17,
   },
 });
 
