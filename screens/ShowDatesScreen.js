@@ -5,12 +5,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   RefreshControl,
-  CheckBox,
 } from "react-native";
 import { SearchBar } from "react-native-elements";
 import AsyncStoarge from "@react-native-community/async-storage";
 import Day from "./Components/Day";
 import { FlatList } from "react-native-gesture-handler";
+import { LinearGradient } from "expo-linear-gradient";
+const colors = require("../colors");
 
 const dateToday = new Date().toJSON().split("T")[0];
 let dateWeek = [];
@@ -66,7 +67,10 @@ function ShowDatesScreen() {
           setDataInDB(res);
           setFilteredData(res);
           setDaysAndAllDays({
-            days: daysAndAllDays.days || Object.keys(res).sort().reverse(),
+            days:
+              daysAndAllDays.timePicked === "all"
+                ? Object.keys(res).sort().reverse()
+                : daysAndAllDays.days || Object.keys(res).sort().reverse(),
             allDays: Object.keys(res).sort().reverse(),
             timePicked: daysAndAllDays.timePicked,
           });
@@ -83,127 +87,174 @@ function ShowDatesScreen() {
   function searchInDB(search) {
     let completed_filtered_list = {};
     setSearch(search);
-    const filterToSearch = daysAndAllDays.days.map((data) =>
-      dataInDb[data].filter((res) => {
-        return Object.keys(res).find((item) => {
-          return res[item].indexOf(search) !== -1;
-        });
-      })
-    );
-    filterToSearch.forEach((item) => {
-      if (item !== "undefined" && item.length > 0) {
-        completed_filtered_list[item[0].day] = item;
-      }
-    });
-    setFilteredData(completed_filtered_list);
+    if (daysAndAllDays.allDays.length !== 0) {
+      const filterToSearch = daysAndAllDays.days.map((data) =>
+        dataInDb[data].filter((res) => {
+          return Object.keys(res).find((item) => {
+            return res[item].indexOf(search) !== -1;
+          });
+        })
+      );
+      filterToSearch.forEach((item) => {
+        if (item !== "undefined" && item.length > 0) {
+          completed_filtered_list[item[0].day] = item;
+        }
+      });
+      setFilteredData(completed_filtered_list);
+    }
   }
-
   return (
-    <View style={{ flex: 1 }}>
-      <SearchBar
-        placeholder={"חיפוש"}
-        onChangeText={searchInDB}
-        value={search}
-      />
-      <View style={styles.time_to_show}>
-        <TouchableOpacity
-          style={{
-            flex: 1,
-            backgroundColor:
-              daysAndAllDays.timePicked === "all" ? "#1c1c1c" : "#4a4a4a",
-          }}
-          onPress={() =>
-            setDaysAndAllDays({
-              allDays: [...daysAndAllDays.allDays],
-              days: [...daysAndAllDays.allDays],
-              timePicked: "all",
-            })
-          }
-        >
-          <Text style={styles.time_to_show_text}>הכל</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            flex: 1,
-            backgroundColor:
-              daysAndAllDays.timePicked === "week" ? "#1c1c1c" : "#4a4a4a",
-          }}
-          onPress={() =>
-            setDaysAndAllDays({
-              allDays: [...daysAndAllDays.allDays],
-              days: dateWeek.reverse(),
-              timePicked: "week",
-            })
-          }
-        >
-          <Text style={styles.time_to_show_text}>השבוע</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            flex: 1,
-            backgroundColor:
-              daysAndAllDays.timePicked === "day" ? "#1c1c1c" : "#4a4a4a",
-          }}
-          onPress={() =>
-            setDaysAndAllDays({
-              allDays: [...daysAndAllDays.allDays],
-              days: [dateToday],
-              timePicked: "day",
-            })
-          }
-        >
-          <Text style={styles.time_to_show_text}>היום</Text>
-        </TouchableOpacity>
-      </View>
-
-      {filteredData ? (
-        Object.keys(filteredData).length === 0 ? (
-          <Text style={styles.notFound}>לא נמצא תור בשם זה</Text>
-        ) : null
-      ) : null}
-
-      {daysAndAllDays ? (
-        <FlatList
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={() => setRefreshing(true)}
-            />
-          }
-          style={styles.scroller}
-          data={daysAndAllDays.days}
-          keyExtractor={(event) => event}
-          renderItem={(event) => (
-            <Day
-              dateToday={dateToday}
-              dates={filteredData[event.item]}
-              name={event.item}
-              onRefresh={() => setRefreshing(true)}
-            />
-          )}
+    <LinearGradient
+      colors={[colors.grey, colors.lightBlack]}
+      style={{ flex: 1 }}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+    >
+      <View style={{ flex: 1 }}>
+        <SearchBar
+          placeholder={"חיפוש"}
+          onChangeText={searchInDB}
+          value={search}
         />
-      ) : (
-        <Text>Loading...</Text>
-      )}
-    </View>
+        <View style={styles.time_to_show}>
+          <TouchableOpacity
+            style={{
+              flex: 1,
+            }}
+            onPress={() =>
+              setDaysAndAllDays({
+                allDays: [...daysAndAllDays.allDays],
+                days: [...daysAndAllDays.allDays],
+                timePicked: "all",
+              })
+            }
+          >
+            <Text
+              style={[
+                styles.time_to_show_text,
+                {
+                  backgroundColor:
+                    daysAndAllDays.timePicked === "all"
+                      ? colors.red
+                      : colors.grey,
+                },
+              ]}
+            >
+              הכל
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              flex: 1,
+            }}
+            onPress={() =>
+              setDaysAndAllDays({
+                allDays: [...daysAndAllDays.allDays],
+                days: dateWeek.reverse(),
+                timePicked: "week",
+              })
+            }
+          >
+            <Text
+              style={[
+                styles.time_to_show_text,
+                {
+                  backgroundColor:
+                    daysAndAllDays.timePicked === "week"
+                      ? colors.red
+                      : colors.grey,
+                },
+              ]}
+            >
+              השבוע
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              flex: 1,
+            }}
+            onPress={() =>
+              setDaysAndAllDays({
+                allDays: [...daysAndAllDays.allDays],
+                days: [dateToday],
+                timePicked: "day",
+              })
+            }
+          >
+            <Text
+              style={[
+                styles.time_to_show_text,
+                {
+                  backgroundColor:
+                    daysAndAllDays.timePicked === "day"
+                      ? colors.red
+                      : colors.grey,
+                },
+              ]}
+            >
+              היום
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {filteredData ? (
+          Object.keys(filteredData).length === 0 ? (
+            <Text style={styles.notFound}>לא נמצאו תורים</Text>
+          ) : null
+        ) : null}
+
+        {daysAndAllDays ? (
+          <FlatList
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={() => setRefreshing(true)}
+              />
+            }
+            style={styles.scroller}
+            data={daysAndAllDays.days}
+            keyExtractor={(event) => event}
+            renderItem={(event) => (
+              <Day
+                dateToday={dateToday}
+                dates={filteredData[event.item]}
+                name={event.item}
+                onRefresh={() => setRefreshing(true)}
+              />
+            )}
+          />
+        ) : (
+          <Text>Loading...</Text>
+        )}
+      </View>
+    </LinearGradient>
   );
 }
+
 const styles = StyleSheet.create({
   scroller: {},
   time_to_show: {
     flexDirection: "row",
     justifyContent: "space-around",
     fontSize: 30,
+    borderBottomWidth: 1,
+    backgroundColor: colors.lightBlack,
   },
   time_to_show_text: {
     borderWidth: 2,
-    fontSize: 30,
-    padding: 10,
-    borderColor: "aliceblue",
+    fontSize: 29,
+    margin: 8,
+    borderRadius: 20,
+    borderColor: colors.grey,
     color: "aliceblue",
     textAlign: "center",
   },
-  notFound: { fontSize: 37, textAlign: "center", marginTop: 60 },
+  notFound: {
+    color: "aliceblue",
+    fontSize: 37,
+    textAlign: "center",
+    marginTop: 60,
+  },
 });
 
 export default ShowDatesScreen;

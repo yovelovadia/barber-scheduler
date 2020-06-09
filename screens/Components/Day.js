@@ -1,6 +1,15 @@
-import { View, Text, StyleSheet, NativeModules, Platform } from "react-native";
-import React, { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  NativeModules,
+  Platform,
+  TouchableHighlight,
+  TouchableWithoutFeedback,
+} from "react-native";
+import React, { useState, useEffect } from "react";
 import SettingsOnDate from "./SettingsOnDate";
+const colors = require("../../colors.json");
 
 const months_names = [
   "ינואר",
@@ -17,7 +26,6 @@ const months_names = [
   "דצמבר",
 ];
 const day_names = ["ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת"];
-
 const deviceLanguage =
   Platform.OS === "ios"
     ? NativeModules.SettingsManager.settings.AppleLocale ||
@@ -37,43 +45,62 @@ function Day(props) {
   const [toggleShow, setToggleShow] = useState(
     props.dateToday === props.name ? true : false
   );
-
   return (
     <View>
       {props.dates ? (
-        <View style={styles.header}>
-          <Text style={styles.text}>{whatYear}</Text>
-
-          <Text
-            onPress={() => setToggleShow(!toggleShow)}
-            style={{ ...styles.date, ...styles.text }}
+        <TouchableHighlight onPress={() => setToggleShow(!toggleShow)}>
+          <View
+            style={[
+              styles.header,
+              {
+                backgroundColor:
+                  props.dateToday === props.name ? colors.red : colors.grey,
+              },
+            ]}
           >
-            יום {day_names[whatDayInWeek]} {whatDayInMonth} ב
-            {months_names[whatMonth]}{" "}
-          </Text>
-        </View>
+            <Text style={styles.year}>{whatYear}</Text>
+
+            <Text style={styles.date}>
+              יום {day_names[whatDayInWeek]} {whatDayInMonth} ב
+              {months_names[whatMonth]}{" "}
+            </Text>
+          </View>
+        </TouchableHighlight>
       ) : null}
 
       {props.dates && toggleShow
-        ? props.dates.map((item) => (
-            <View style={styles.customersContainer} key={item.id}>
-              <Text
-                onPress={() => setModalVisible(!modalVisible)}
-                style={styles.customersText}
+        ? props.dates
+            .sort(
+              (a, b) =>
+                new Date("1000-10-10T" + b.hour) -
+                new Date("1000-10-10T" + a.hour)
+            )
+
+            .map((item) => (
+              <TouchableWithoutFeedback
+                key={item.id}
+                onPress={() =>
+                  setModalVisible({ modal: !modalVisible, id: item.id })
+                }
               >
-                {item.name},{item.phone},{item.tor},{item.colorNumber},
-                {item.oxPrecentage},{item.colorCompany}
-              </Text>
-              {modalVisible ? (
-                <SettingsOnDate
-                  onRefresh={props.onRefresh}
-                  isVisible={modalVisible}
-                  onPress={() => setModalVisible(!modalVisible)}
-                  item={item}
-                ></SettingsOnDate>
-              ) : null}
-            </View>
-          ))
+                <View style={styles.customersContainer}>
+                  <Text style={styles.textHour}>{item.hour}</Text>
+                  <Text style={styles.customersText}>
+                    {item.name} {item.phone} {item.tor} {item.colorNumber}{" "}
+                    {item.oxPrecentage}
+                    {item.oxPrecentage ? "%" : null} {item.colorCompany}
+                  </Text>
+                  {modalVisible && modalVisible.id === item.id ? (
+                    <SettingsOnDate
+                      onRefresh={props.onRefresh}
+                      isVisible={modalVisible}
+                      onPress={() => setModalVisible(!modalVisible)}
+                      item={item}
+                    ></SettingsOnDate>
+                  ) : null}
+                </View>
+              </TouchableWithoutFeedback>
+            ))
         : null}
     </View>
   );
@@ -82,23 +109,38 @@ function Day(props) {
 const styles = StyleSheet.create({
   header: {
     flex: 1,
-    backgroundColor: "grey",
-    flexDirection: "row",
+    padding: 14,
+    borderBottomWidth: 2,
+    borderBottomColor: "black",
+    borderRadius: 10,
   },
-  //en_US
+
+  year: {
+    fontSize: 14,
+    textAlign: deviceLanguage === "iw_IL" ? "right" : "left",
+  },
 
   date: {
-    position: "absolute",
-    right: 0,
-  },
-  //IL
-
-  text: {
-    fontSize: 20,
-  },
-  customersText: {
-    textAlign: deviceLanguage == "iw_IL" ? "left" : "left",
     fontSize: 30,
+    textAlign: deviceLanguage === "iw_IL" ? "left" : "right",
+    color: colors.darkWhite,
+  },
+  customersContainer: {
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBottomColor: "aliceblue",
+  },
+
+  customersText: {
+    fontSize: 20,
+    color: colors.darkWhite,
+    textAlign: deviceLanguage == "iw_IL" ? "left" : "right",
+  },
+
+  textHour: {
+    color: "aliceblue",
+    fontSize: 30,
+    textAlign: deviceLanguage == "iw_IL" ? "right" : "left",
   },
 });
 

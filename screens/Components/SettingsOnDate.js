@@ -5,11 +5,14 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  BackHandler,
 } from "react-native";
 import Modal from "react-native-modal";
 import ClassicTextInput from "./ClassicTextInput";
 import DayHourPick from "./DayHourPick";
 import AsyncStoarge from "@react-native-community/async-storage";
+import { LinearGradient } from "expo-linear-gradient";
+const colors = require("../../colors.json");
 
 function SettingsOnDate(props) {
   const [data, setData] = useState({
@@ -46,68 +49,75 @@ function SettingsOnDate(props) {
   }
 
   return (
-    <Modal isVisible={props.isVisible}>
-      <ScrollView>
+    <Modal isVisible={props.isVisible.modal} onBackButtonPress={props.onPress}>
+      <LinearGradient
+        colors={[colors.lightGrey, colors.grey]}
+        style={{ flex: 1 }}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
         <Text onPress={props.onPress} style={styles.x}>
           X
         </Text>
-        <View style={styles.container}>
-          <ClassicTextInput
-            inputName={"שם"}
-            onChangeText={(text) => setData({ ...data, name: text })}
-            value={data.name}
-          />
-          <ClassicTextInput
-            inputName={"טלפון"}
-            keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
-            onChangeText={(text) => setData({ ...data, phone: text })}
-            value={data.phone}
-          />
-          <ClassicTextInput
-            inputName={"תור"}
-            onChangeText={(text) => setData({ ...data, tor: text })}
-            value={data.tor}
-          />
-          <ClassicTextInput
-            keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
-            inputName={"מספר צבע"}
-            onChangeText={(text) => setData({ ...data, colorNumber: text })}
-            value={data.colorNumber}
-          />
-          <ClassicTextInput
-            inputName={"אחוז חמצן"}
-            keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
-            onChangeText={(text) => setData({ ...data, oxPrecentage: text })}
-            value={data.oxPrecentage}
-          />
-          <ClassicTextInput
-            inputName={"חברת צבעים"}
-            onChangeText={(text) => setData({ ...data, colorCompany: text })}
-            value={data.colorCompany}
-          />
+        <ScrollView>
+          <View style={styles.container}>
+            <ClassicTextInput
+              inputName={"שם"}
+              onChangeText={(text) => setData({ ...data, name: text })}
+              value={data.name}
+            />
+            <ClassicTextInput
+              inputName={"טלפון"}
+              keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
+              onChangeText={(text) => setData({ ...data, phone: text })}
+              value={data.phone}
+            />
+            <ClassicTextInput
+              inputName={"תור"}
+              onChangeText={(text) => setData({ ...data, tor: text })}
+              value={data.tor}
+            />
+            <ClassicTextInput
+              keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
+              inputName={"מספר צבע"}
+              onChangeText={(text) => setData({ ...data, colorNumber: text })}
+              value={data.colorNumber}
+            />
+            <ClassicTextInput
+              inputName={"אחוז חמצן"}
+              keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
+              onChangeText={(text) => setData({ ...data, oxPrecentage: text })}
+              value={data.oxPrecentage}
+            />
+            <ClassicTextInput
+              inputName={"חברת צבעים"}
+              onChangeText={(text) => setData({ ...data, colorCompany: text })}
+              value={data.colorCompany}
+            />
 
-          <DayHourPick
-            alreadyPickedDate={new Date(data.day + "T" + data.hour)}
-            dateValue={data.day}
-            timeValue={data.hour}
-            onSubmit={(value) => {
-              setData({ ...data, hour: value[1], day: value[0] });
-            }}
-          />
+            <DayHourPick
+              alreadyPickedDate={new Date(data.day + "T" + data.hour)}
+              dateValue={data.day}
+              timeValue={data.hour}
+              onSubmit={(value) => {
+                setData({ ...data, hour: value[1], day: value[0] });
+              }}
+            />
 
-          <View style={styles.buttonContainer}>
-            <Text style={styles.cancel} onPress={props.onPress}>
-              ביטול
-            </Text>
-            <Text style={styles.save} onPress={updateTor}>
-              שמור וצא
+            <View style={styles.buttonContainer}>
+              <Text style={styles.cancel} onPress={props.onPress}>
+                ביטול
+              </Text>
+              <Text style={styles.save} onPress={updateTor}>
+                שמור וצא
+              </Text>
+            </View>
+            <Text onPress={deleteTor} style={styles.delete}>
+              מחק תור
             </Text>
           </View>
-          <Text onPress={deleteTor} style={styles.delete}>
-            מחק תור
-          </Text>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </LinearGradient>
     </Modal>
   );
 }
@@ -116,7 +126,6 @@ export default SettingsOnDate;
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "aliceblue",
     flex: 1,
     alignItems: "center",
   },
@@ -126,19 +135,20 @@ const styles = StyleSheet.create({
     marginBottom: 60,
   },
   cancel: {
-    color: "red",
+    color: colors.lighterRed,
     marginRight: 80,
     fontSize: 17,
   },
 
   save: {
     fontSize: 17,
+    color: "aliceblue",
   },
   delete: {
     marginBottom: 8,
 
     padding: 17,
-    backgroundColor: "red",
+    backgroundColor: colors.lighterRed,
     color: "aliceblue",
     borderWidth: 1,
     borderColor: "grey",
@@ -146,6 +156,7 @@ const styles = StyleSheet.create({
   },
   x: {
     fontSize: 25,
-    position: "relative",
+    color: "aliceblue",
+    textAlign: "center",
   },
 });

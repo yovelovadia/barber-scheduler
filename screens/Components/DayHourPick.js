@@ -1,26 +1,30 @@
 import React, { useState } from "react";
-import { View, Button, Platform, StyleSheet, Text } from "react-native";
+import { View, Platform, StyleSheet, Text } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
+const moment = require("moment");
+const colors = require("../../colors.json");
 
 const DayHourPick = (props) => {
-  const [date, setDate] = useState(props.alreadyPickedDate || new Date());
+  const momentToday = moment(new Date()).format();
+  const [date, setDate] = useState(
+    props.alreadyPickedDate || new Date(momentToday)
+  );
   const [mode, setMode] = useState("date");
   const [show, setShow] = useState(false);
   const [timePicked, setTimePicked] = useState(
-    props.timeValue || JSON.stringify(new Date()).slice(12, 17)
+    props.timeValue || JSON.stringify(momentToday).slice(12, 17)
   );
   const [datePicked, setDatePicked] = useState(
-    props.dateValue || JSON.stringify(new Date()).slice(1, 11)
+    props.dateValue || JSON.stringify(momentToday).slice(1, 11)
   );
   const onChange = (event, selectedDate) => {
-    const currentDate = selectedDate || date;
+    const currentDate = moment(selectedDate).format() || date;
     setShow(Platform.OS === "ios");
-    setDate(currentDate);
+    setDate(new Date(currentDate));
     if (selectedDate) {
-      const json = JSON.stringify(selectedDate);
-      setTimePicked(json.slice(12, 17));
-      setDatePicked(json.slice(1, 11));
-      props.onSubmit([json.slice(1, 11), json.slice(12, 17)]);
+      setTimePicked(currentDate.slice(11, 16));
+      setDatePicked(currentDate.slice(0, 10));
+      props.onSubmit([currentDate.slice(0, 10), currentDate.slice(11, 16)]);
     }
   };
 
@@ -28,7 +32,6 @@ const DayHourPick = (props) => {
     setShow(true);
     setMode(currentMode);
   };
-
   const showDatepicker = () => {
     showMode("date");
   };
@@ -79,7 +82,7 @@ const styles = StyleSheet.create({
   },
 
   buttons: {
-    backgroundColor: "#52aee3",
+    backgroundColor: colors.red,
     color: "aliceblue",
     fontSize: 18,
     width: 110,
@@ -90,6 +93,7 @@ const styles = StyleSheet.create({
 
   timeText: {
     fontSize: 17,
+    color: "aliceblue",
   },
 });
 

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -6,10 +6,13 @@ import {
   ScrollView,
   TouchableHighlight,
   Platform,
+  Alert,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import ClassicTextInput from "./Components/ClassicTextInput";
 import DayHourPick from "./Components/DayHourPick";
 import AsyncStoarge from "@react-native-community/async-storage";
+const colors = require("../colors.json");
 
 function NewClientScreen() {
   const day = JSON.stringify(new Date()).slice(1, 11);
@@ -27,7 +30,8 @@ function NewClientScreen() {
       dataWithId["id"] = id;
       const jsonValue = JSON.stringify(dataWithId);
       await AsyncStoarge.setItem(id, jsonValue);
-      alert("לקוח חדש!");
+      setData({ day, hour });
+      Alert.alert("", "לקוח חדש נוצר");
     } catch (err) {
       console.log(err);
     }
@@ -52,74 +56,87 @@ function NewClientScreen() {
   }
 
   return (
-    <View>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.container}>
-          <ClassicTextInput
-            ref={nameRef}
-            inputName={"שם"}
-            onChangeText={(text) => setData({ ...data, name: text })}
-            onSubmit={() => {
-              phoneRef.current.focus();
-            }}
-          />
-          <ClassicTextInput
-            ref={phoneRef}
-            inputName={"טלפון"}
-            keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
-            onChangeText={(text) => setData({ ...data, phone: text })}
-            onSubmit={() => {
-              torRef.current.focus();
-            }}
-          />
-          <ClassicTextInput
-            ref={torRef}
-            inputName={"תור"}
-            onChangeText={(text) => setData({ ...data, tor: text })}
-            onSubmit={() => {
-              colorNumberRef.current.focus();
-            }}
-          />
-          <ClassicTextInput
-            ref={colorNumberRef}
-            inputName={"מספר צבע"}
-            keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
-            onChangeText={(text) => setData({ ...data, colorNumber: text })}
-            onSubmit={() => {
-              oxPrecentageRef.current.focus();
-            }}
-          />
-          <ClassicTextInput
-            ref={oxPrecentageRef}
-            inputName={"אחוז חמצן"}
-            keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
-            onChangeText={(text) => setData({ ...data, oxPrecentage: text })}
-            onSubmit={() => {
-              colorCompanyRef.current.focus();
-            }}
-          />
-          <ClassicTextInput
-            ref={colorCompanyRef}
-            inputName={"חברת צבעים"}
-            onChangeText={(text) => setData({ ...data, colorCompany: text })}
-          />
+    <LinearGradient
+      colors={[colors.grey, colors.lightBlack]}
+      style={{ flex: 1 }}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+    >
+      <View>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.container}>
+            <ClassicTextInput
+              ref={nameRef}
+              inputName={"שם"}
+              value={data.name}
+              onChangeText={(text) => setData({ ...data, name: text })}
+              onSubmit={() => {
+                phoneRef.current.focus();
+              }}
+            />
+            <ClassicTextInput
+              ref={phoneRef}
+              inputName={"טלפון"}
+              value={data.phone}
+              keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
+              onChangeText={(text) => setData({ ...data, phone: text })}
+              onSubmit={() => {
+                torRef.current.focus();
+              }}
+            />
+            <ClassicTextInput
+              ref={torRef}
+              inputName={"תור"}
+              value={data.tor}
+              onChangeText={(text) => setData({ ...data, tor: text })}
+              onSubmit={() => {
+                colorNumberRef.current.focus();
+              }}
+            />
+            <ClassicTextInput
+              ref={colorNumberRef}
+              inputName={"מספר צבע"}
+              value={data.colorNumber}
+              keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
+              onChangeText={(text) => setData({ ...data, colorNumber: text })}
+              onSubmit={() => {
+                oxPrecentageRef.current.focus();
+              }}
+            />
+            <ClassicTextInput
+              ref={oxPrecentageRef}
+              inputName={"אחוז חמצן"}
+              value={data.oxPrecentage}
+              keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
+              onChangeText={(text) => setData({ ...data, oxPrecentage: text })}
+              onSubmit={() => {
+                colorCompanyRef.current.focus();
+              }}
+            />
+            <ClassicTextInput
+              ref={colorCompanyRef}
+              inputName={"חברת צבעים"}
+              value={data.colorCompany}
+              onChangeText={(text) => setData({ ...data, colorCompany: text })}
+            />
 
-          <DayHourPick
-            onSubmit={(value) => {
-              setData({ ...data, hour: value[1], day: value[0] });
-            }}
-          />
+            <DayHourPick
+              onSubmit={(value) => {
+                setData({ ...data, hour: value[1], day: value[0] });
+              }}
+            />
 
-          <TouchableHighlight
-            onPress={saveNewClient}
-            underlayColor={"#0299f7"}
-            style={styles.submit}
-          >
-            <Text style={styles.submitText}> תור חדש</Text>
-          </TouchableHighlight>
-        </View>
-      </ScrollView>
-    </View>
+            <TouchableHighlight
+              onPress={saveNewClient}
+              underlayColor={"#0299f7"}
+              style={styles.submit}
+            >
+              <Text style={styles.submitText}> תור חדש</Text>
+            </TouchableHighlight>
+          </View>
+        </ScrollView>
+      </View>
+    </LinearGradient>
   );
 }
 
@@ -132,7 +149,7 @@ const styles = StyleSheet.create({
   submit: {
     marginTop: 50,
     marginBottom: 30,
-    backgroundColor: "#a6d8f5",
+    backgroundColor: colors.darkWhite,
     padding: 18,
   },
 

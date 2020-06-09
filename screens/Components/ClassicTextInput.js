@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TextInput } from "react-native";
+const colors = require("../../colors.json");
 
 function ClassicTextInput(props, ref) {
-  const [value, setValue] = useState(null);
-
   return (
     <View style={styles.input_container}>
       <Text style={styles.name}>{props.inputName}</Text>
@@ -15,7 +14,6 @@ function ClassicTextInput(props, ref) {
         style={styles.text_input}
         underlineColorAndroid="transparent"
         onChangeText={(text) => {
-          setValue(text);
           props.onChangeText(text);
         }}
       />
@@ -29,14 +27,15 @@ const styles = StyleSheet.create({
   },
   text_input: {
     borderBottomWidth: 1,
-    borderBottomColor: "grey",
+    borderBottomColor: "aliceblue",
+    color: "aliceblue",
     width: 200,
     fontSize: 28,
     textAlign: "right",
     borderWidth: 0,
   },
   name: {
-    color: "#53b5ed",
+    color: colors.darkWhite,
     fontSize: 20,
   },
 });
