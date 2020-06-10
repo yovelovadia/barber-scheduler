@@ -205,6 +205,7 @@ function ShowDatesScreen() {
 
         {daysAndAllDays ? (
           <FlatList
+            showsVerticalScrollIndicator={false}
             refreshControl={
               <RefreshControl
                 refreshing={refreshing}

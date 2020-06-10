@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/Ionicons";
+import LocalPushNotification from "../LocalPushNotification";
 
 const colors = require("../colors.json");
 
@@ -26,7 +27,8 @@ function HomeScreen() {
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
-      <View>
+      <LocalPushNotification />
+      <View style={styles.logoContainer}>
         <Image
           style={styles.logo}
           source={require("../assets/completeLogo.png")}
@@ -45,7 +47,12 @@ const styles = StyleSheet.create({
   logo: {
     height: 370,
     width: 200,
+  },
+  logoContainer: {
     alignSelf: deviceLanguage === "iw_IL" ? "flex-end" : "flex-start",
+
+    flex: 1,
+    justifyContent: "flex-end",
   },
   settingsIcon: {
     position: "absolute",

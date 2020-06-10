@@ -1,11 +1,12 @@
 import React from "react";
-import { StyleSheet, SafeAreaView, Platform } from "react-native";
+import { StyleSheet, SafeAreaView, Platform, StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import HomeScreen from "./screens/HomeScreen.js";
 import NewClientScreen from "./screens/NewClientScreen.js";
 import ShowDatesScreen from "./screens/ShowDatesScreen.js";
 import Icon from "react-native-vector-icons/Ionicons";
+
 const colors = require("./colors.json");
 
 const Tab = createMaterialTopTabNavigator();

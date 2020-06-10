@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "689915918892",
+    "firebase_url": "https://barber-schedule-d3257.firebaseio.com",
+    "project_id": "barber-schedule-d3257",
+    "storage_bucket": "barber-schedule-d3257.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:689915918892:android:a442463c8b8f0ba95def89",
+        "android_client_info": {
+          "package_name": "react.native.new.project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "689915918892-17afs87q5trd7q3oo3d5mk5rkl61e9i1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgQcmqUvMIwZLMSa7Ppc2OKipNWrwBm48"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "689915918892-17afs87q5trd7q3oo3d5mk5rkl61e9i1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
