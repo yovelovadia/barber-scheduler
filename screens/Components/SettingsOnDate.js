@@ -1,17 +1,13 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  BackHandler,
-} from "react-native";
+import { View, Text, StyleSheet, ScrollView, Linking } from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
 import Modal from "react-native-modal";
 import ClassicTextInput from "./ClassicTextInput";
 import DayHourPick from "./DayHourPick";
 import AsyncStoarge from "@react-native-community/async-storage";
 import { LinearGradient } from "expo-linear-gradient";
+import { Notifications } from "expo";
+import moment from "moment";
 const colors = require("../../colors.json");
 
 function SettingsOnDate(props) {
@@ -25,26 +21,65 @@ function SettingsOnDate(props) {
     day: props.item.day,
     hour: props.item.hour,
     id: props.item.id,
+    notificationId: props.item.notificationId,
   });
+  const dayPassed =
+    new Date(`${data.day}T${data.hour}`) > new Date() ? false : true;
 
   async function deleteTor() {
     try {
+      if (!dayPassed) {
+        await Notifications.cancelScheduledNotificationAsync(
+          props.item.notificationId
+        );
+      }
       await AsyncStoarge.removeItem(props.item.id);
       props.onPress();
       props.onRefresh();
     } catch (err) {
-      console.log(err);
+      alert("קרתה בעיה נסה שנית");
     }
   }
 
   async function updateTor() {
-    try {
-      const jsonValue = JSON.stringify(data);
-      await AsyncStoarge.setItem(data.id, jsonValue);
-      props.onPress();
-      props.onRefresh();
-    } catch (err) {
-      console.log(err);
+    if (dayPassed) {
+      alert("נסה שנית... תאריך זה כבר עבר");
+    } else {
+      try {
+        if (props.item.day + props.item.hour !== data.day + data.hour) {
+          await Notifications.cancelScheduledNotificationAsync(
+            props.item.notificationId
+          );
+
+          const notificationDate = moment(`${data.day}T${data.hour}`)
+            .utc()
+            .subtract("1", "hour")
+            .toDate();
+
+          let notificationId = await Notifications.scheduleLocalNotificationAsync(
+            {
+              title: "Swisa",
+              body: `תור בשעה ${data.hour} על שם ${data.name}`,
+              android: { channelId: "default" },
+            },
+            { time: notificationDate }
+          );
+
+          const dataWithId = data;
+          data["notificationId"] = notificationId;
+          const jsonValue = JSON.stringify(dataWithId);
+          await AsyncStoarge.setItem(data.id, jsonValue);
+          props.onPress();
+          props.onRefresh();
+        } else {
+          const jsonValue = JSON.stringify(data);
+          await AsyncStoarge.setItem(data.id, jsonValue);
+          props.onPress();
+          props.onRefresh();
+        }
+      } catch (err) {
+        alert("קרתה בעיה נא נסה שנית");
+      }
     }
   }
 
@@ -66,6 +101,13 @@ function SettingsOnDate(props) {
               onChangeText={(text) => setData({ ...data, name: text })}
               value={data.name}
             />
+            <Icon
+              name={"ios-phone-portrait"}
+              size={40}
+              color={"aliceblue"}
+              style={styles.phoneIcon}
+              onPress={() => Linking.openURL(`tel:${data.phone}`)}
+            />
             <ClassicTextInput
               inputName={"טלפון"}
               keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
@@ -78,7 +120,6 @@ function SettingsOnDate(props) {
               value={data.tor}
             />
             <ClassicTextInput
-              keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
               inputName={"מספר צבע"}
               onChangeText={(text) => setData({ ...data, colorNumber: text })}
               value={data.colorNumber}
@@ -96,9 +137,7 @@ function SettingsOnDate(props) {
             />
 
             <DayHourPick
-              alreadyPickedDate={new Date(data.day + "T" + data.hour)}
-              dateValue={data.day}
-              timeValue={data.hour}
+              dateToday={moment(data.day + "T" + data.hour).format()}
               onSubmit={(value) => {
                 setData({ ...data, hour: value[1], day: value[0] });
               }}
@@ -133,6 +172,12 @@ const styles = StyleSheet.create({
     marginTop: 60,
     flexDirection: "row",
     marginBottom: 60,
+  },
+  phoneIcon: {
+    position: "absolute",
+    alignSelf: "flex-start",
+    top: 165,
+    left: 40,
   },
   cancel: {
     color: colors.lighterRed,

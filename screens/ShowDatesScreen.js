@@ -22,13 +22,12 @@ for (let i = 0; i < 7; i++) {
   dateWeek.push(day.toJSON().split("T")[0]);
 }
 
-function ShowDatesScreen() {
+function ShowDatesScreen({ navigation }) {
   const [refreshing, setRefreshing] = React.useState(false);
   const [search, setSearch] = useState(null);
   const [dataInDb, setDataInDB] = useState(null);
   const [daysAndAllDays, setDaysAndAllDays] = useState({ timePicked: "all" });
   const [filteredData, setFilteredData] = useState(null);
-
   useEffect(() => {
     let unmounted = false;
 
@@ -41,7 +40,7 @@ function ShowDatesScreen() {
           takingDbData.push(JSON.parse(data[1]));
         });
       } catch (err) {
-        console.log(err);
+        null;
       }
       return takingDbData;
     }
@@ -77,7 +76,7 @@ function ShowDatesScreen() {
         })
         .then(() => setRefreshing(false))
 
-        .catch((err) => console.log(err));
+        .catch((err) => null);
     }
     return () => {
       unmounted = true;
@@ -88,10 +87,10 @@ function ShowDatesScreen() {
     let completed_filtered_list = {};
     setSearch(search);
     if (daysAndAllDays.allDays.length !== 0) {
-      const filterToSearch = daysAndAllDays.days.map((data) =>
+      const filterToSearch = daysAndAllDays.allDays.map((data) =>
         dataInDb[data].filter((res) => {
           return Object.keys(res).find((item) => {
-            return res[item].indexOf(search) !== -1;
+            return res[item].toString().indexOf(search) !== -1;
           });
         })
       );
@@ -217,6 +216,7 @@ function ShowDatesScreen() {
             keyExtractor={(event) => event}
             renderItem={(event) => (
               <Day
+                createNew={(data) => navigation.jumpTo("לקוח חדש", { data })}
                 dateToday={dateToday}
                 dates={filteredData[event.item]}
                 name={event.item}

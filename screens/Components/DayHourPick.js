@@ -1,32 +1,43 @@
-import React, { useState } from "react";
-import { View, Platform, StyleSheet, Text } from "react-native";
+import React, { useState, useEffect } from "react";
+import { View, StyleSheet, Text } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
 const moment = require("moment");
 const colors = require("../../colors.json");
 
 const DayHourPick = (props) => {
-  const momentToday = moment(new Date()).format();
-  const [date, setDate] = useState(
-    props.alreadyPickedDate || new Date(momentToday)
-  );
+  const timePicked = props.dateToday;
   const [mode, setMode] = useState("date");
   const [show, setShow] = useState(false);
-  const [timePicked, setTimePicked] = useState(
-    props.timeValue || JSON.stringify(momentToday).slice(12, 17)
-  );
-  const [datePicked, setDatePicked] = useState(
-    props.dateValue || JSON.stringify(momentToday).slice(1, 11)
-  );
-  const onChange = (event, selectedDate) => {
-    const currentDate = moment(selectedDate).format() || date;
-    setShow(Platform.OS === "ios");
+  const [date, setDate] = useState(new Date(timePicked));
+
+  const [showTime, setShowTime] = useState({
+    hour: JSON.stringify(timePicked).slice(12, 17),
+    day: JSON.stringify(timePicked).slice(1, 11),
+  });
+  useEffect(() => {
+    // incase coming from dates screen and pressing plus
+    if (props.navigation) {
+      setShowTime({ hour: showTime.hour, day: props.navigation.data });
+      setDate(
+        new Date(
+          `${props.navigation.data}T${JSON.stringify(timePicked).slice(12, 17)}`
+        )
+      );
+    }
+  }, [props.navigation]);
+
+  function handleChange(event, selectedDate) {
+    setShow(false);
+    const currentDate = moment(selectedDate).format() || moment(date).format();
     setDate(new Date(currentDate));
     if (selectedDate) {
-      setTimePicked(currentDate.slice(11, 16));
-      setDatePicked(currentDate.slice(0, 10));
+      setShowTime({
+        day: currentDate.slice(0, 10),
+        hour: currentDate.slice(11, 16),
+      });
       props.onSubmit([currentDate.slice(0, 10), currentDate.slice(11, 16)]);
     }
-  };
+  }
 
   const showMode = (currentMode) => {
     setShow(true);
@@ -46,13 +57,13 @@ const DayHourPick = (props) => {
         <Text style={styles.buttons} onPress={showDatepicker}>
           בחר תאריך
         </Text>
-        <Text style={styles.timeText}>{datePicked}</Text>
+        <Text style={styles.timeText}>{showTime.day}</Text>
       </View>
       <View style={styles.buttonTextContainer}>
         <Text style={styles.buttons} onPress={showTimepicker}>
           בחר שעה
         </Text>
-        <Text style={styles.timeText}>{timePicked}</Text>
+        <Text style={styles.timeText}>{showTime.hour}</Text>
       </View>
       {show && (
         <DateTimePicker
@@ -62,7 +73,7 @@ const DayHourPick = (props) => {
           mode={mode}
           is24Hour={true}
           display="spinner"
-          onChange={onChange}
+          onChange={handleChange}
         />
       )}
     </View>

@@ -14,6 +14,7 @@ const Tab = createMaterialTopTabNavigator();
 export default function App() {
   return (
     <NavigationContainer>
+      <StatusBar barStyle="aliceblue" backgroundColor={colors.lightBlack} />
       <SafeAreaView style={styles.container} />
       <Tab.Navigator
         initialRouteName={HomeScreen}
@@ -24,6 +25,7 @@ export default function App() {
           indicatorStyle: { height: 0 },
           showIcon: true,
           showLabel: false,
+          lazy: true,
         }}
       >
         <Tab.Screen

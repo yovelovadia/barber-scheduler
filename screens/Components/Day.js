@@ -59,6 +59,11 @@ function Day(props) {
             ]}
           >
             <Text style={styles.year}>{whatYear}</Text>
+            <TouchableWithoutFeedback
+              onPressIn={() => props.createNew(props.name)}
+            >
+              <Text style={styles.addDate}>+</Text>
+            </TouchableWithoutFeedback>
 
             <Text style={styles.date}>
               יום {day_names[whatDayInWeek]} {whatDayInMonth} ב
@@ -131,6 +136,16 @@ const styles = StyleSheet.create({
     borderBottomColor: "aliceblue",
   },
 
+  addDate: {
+    fontSize: 32,
+    color: "aliceblue",
+    textAlign: "center",
+    zIndex: 1,
+    position: "absolute",
+    top: 30,
+    width: 55,
+    right: deviceLanguage === "iw_IL" ? 4 : null,
+  },
   customersText: {
     fontSize: 20,
     color: colors.darkWhite,

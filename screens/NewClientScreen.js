@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,28 +12,69 @@ import { LinearGradient } from "expo-linear-gradient";
 import ClassicTextInput from "./Components/ClassicTextInput";
 import DayHourPick from "./Components/DayHourPick";
 import AsyncStoarge from "@react-native-community/async-storage";
+import { Notifications } from "expo";
+import moment from "moment";
 const colors = require("../colors.json");
 
-function NewClientScreen() {
-  const day = JSON.stringify(new Date()).slice(1, 11);
-  const hour = JSON.stringify(new Date()).slice(12, 17);
+function NewClientScreen(navigation) {
+  let momentDay = moment(new Date()).format();
+  const day = momentDay.slice(0, 10);
+  const hour = momentDay.slice(11, 16);
   const [data, setData] = useState({
     day,
     hour,
   });
+  useEffect(() => {
+    // incase coming from dates screen and pressing plus
+    if (navigation.route.params) {
+      setData({ hour: data.hour, day: navigation.route.params.data });
+    }
+  }, [navigation.route.params]);
+
+  useEffect(() => {
+    Notifications.createChannelAndroidAsync("default", {
+      name: "default",
+      sound: true,
+      priority: "max",
+      vibrate: true,
+    });
+  }, []);
 
   let id = idMaker(16);
 
   async function saveNewClient() {
     try {
-      let dataWithId = data;
-      dataWithId["id"] = id;
-      const jsonValue = JSON.stringify(dataWithId);
-      await AsyncStoarge.setItem(id, jsonValue);
-      setData({ day, hour });
-      Alert.alert("", "לקוח חדש נוצר");
+      if (new Date(`${data.day}T${data.hour}`) < new Date()) {
+        alert("נסה שנית... תאריך זה כבר עבר");
+      } else {
+        const notification = await sendScheduledNotification();
+        let dataWithId = data;
+        dataWithId["id"] = id;
+        dataWithId["notificationId"] = notification;
+        const jsonValue = JSON.stringify(dataWithId);
+        await AsyncStoarge.setItem(id, jsonValue);
+        setData({ day: data.day, hour: data.hour });
+        Alert.alert("", "לקוח חדש נוצר");
+      }
     } catch (err) {
-      console.log(err);
+      alert("קרתה בעיה נא נסה שנית");
+    }
+
+    async function sendScheduledNotification() {
+      const notificationDate = moment(`${data.day}T${data.hour}`)
+        .utc()
+        .subtract("1", "hour")
+        .toDate();
+
+      let notificationId = await Notifications.scheduleLocalNotificationAsync(
+        {
+          title: "תור",
+          body: `תור בשעה ${data.hour}`,
+          android: { channelId: "default" },
+        },
+        { time: notificationDate }
+      );
+      return notificationId;
     }
   }
 
@@ -97,7 +138,6 @@ function NewClientScreen() {
               ref={colorNumberRef}
               inputName={"מספר צבע"}
               value={data.colorNumber}
-              keyboardType={Platform.OS === "ios" ? "number-pad" : "numeric"}
               onChangeText={(text) => setData({ ...data, colorNumber: text })}
               onSubmit={() => {
                 oxPrecentageRef.current.focus();
@@ -121,6 +161,8 @@ function NewClientScreen() {
             />
 
             <DayHourPick
+              navigation={navigation.route.params}
+              dateToday={momentDay}
               onSubmit={(value) => {
                 setData({ ...data, hour: value[1], day: value[0] });
               }}

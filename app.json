@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "react-native-new-project",
-    "slug": "react-native-new-project",
+    "name": "Swisa",
+    "slug": "swisa-schedule",
     "platforms": ["ios", "android", "web"],
     "version": "1.0.0",
     "orientation": "portrait",
@@ -18,9 +18,10 @@
     "ios": {
       "supportsTablet": true
     },
-    "androidStatusBar": {
-      "backgroundColor": "#dedede",
-      "barStyle": "aliceblue"
+
+    "android": {
+      "package": "swisa.com",
+      "googleServicesFile": "./google-services.json"
     }
   }
 }

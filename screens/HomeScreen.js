@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Icon from "react-native-vector-icons/Ionicons";
-import LocalPushNotification from "../LocalPushNotification";
+import AppSettings from "./Components/AppSettings";
 
 const colors = require("../colors.json");
 
@@ -19,7 +19,8 @@ const deviceLanguage =
       NativeModules.SettingsManager.settings.AppleLanguages[0] //iOS 13
     : NativeModules.I18nManager.localeIdentifier;
 
-function HomeScreen() {
+function HomeScreen({ navigation }) {
+  const [toggleSettings, setToggleSettings] = useState(false);
   return (
     <LinearGradient
       colors={[colors.grey, colors.lightBlack]}
@@ -27,7 +28,16 @@ function HomeScreen() {
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
-      <LocalPushNotification />
+      <Text
+        style={styles.createNew}
+        onPress={() => navigation.jumpTo("לקוח חדש")}
+      >
+        יצירת לקוח חדש
+      </Text>
+      <AppSettings
+        toggleSettings={toggleSettings}
+        onPress={() => setToggleSettings(!toggleSettings)}
+      />
       <View style={styles.logoContainer}>
         <Image
           style={styles.logo}
@@ -35,7 +45,12 @@ function HomeScreen() {
         />
       </View>
       <View style={styles.settingsIcon}>
-        <Icon name={"ios-settings"} color={"aliceblue"} size={45} />
+        <Icon
+          onPress={() => setToggleSettings(!toggleSettings)}
+          name={"ios-book"}
+          color={"aliceblue"}
+          size={45}
+        />
       </View>
     </LinearGradient>
   );
@@ -54,6 +69,21 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
   },
+  createNew: {
+    backgroundColor: colors.darkWhite,
+    color: colors.lightBlack,
+    fontFamily: "sans-serif-condensed",
+    fontSize: 15,
+    textAlign: "center",
+    width: 140,
+    padding: 10,
+    borderTopLeftRadius: 13,
+    borderBottomLeftRadius: 13,
+    alignSelf: deviceLanguage === "iw_IL" ? "flex-start" : "flex-end",
+    position: "relative",
+    top: 200,
+  },
+
   settingsIcon: {
     position: "absolute",
     alignSelf: deviceLanguage === "iw_IL" ? "flex-start" : "flex-end",
